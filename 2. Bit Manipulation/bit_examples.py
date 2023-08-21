@@ -1,3 +1,6 @@
+from typing import Any
+
+
 x = 5
 y = 7
 z = 10
@@ -83,3 +86,19 @@ x = x ^ y
 y = x ^ y
 x = x ^ y
 print(f'{x = }, {y = }')
+
+def binary(n: int) -> Any:
+    if n == 0:
+        return '0'
+    result = []
+    while n:
+        result.append(str(n & 1))
+        n = n >> 1
+    return ''.join(result[::-1])
+
+
+print(f'{binary(5) = }')
+print(f'{binary(10) = }')
+print(f'{binary(0) = }')
+print(f'{binary(63) = }')
+print(f'{binary(632394812389412374192834712394871234908) = }')
