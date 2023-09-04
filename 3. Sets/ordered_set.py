@@ -3,24 +3,24 @@ from typing import Generic, TypeVar
 from collections.abc import Iterator, Iterable
 
 T = TypeVar('T')
-IT = TypeVar('IT')
+I = TypeVar('I')
 
 
 class OrderedSet(Generic[T]):
 
-    class __Iterator(Generic[IT]):
+    class __Iterator(Generic[I]):
 
-        __data: list[IT]
+        __data: list[I]
         __current: int
 
-        def __init__(self, values: list[IT]) -> None:
+        def __init__(self, values: list[I]) -> None:
             self.__data = values
             self.__current = 0
 
-        def __iter__(self) -> Iterator[IT]:
+        def __iter__(self) -> Iterator[I]:
             return self
 
-        def __next__(self) -> IT:
+        def __next__(self) -> I:
             if self.__current < len(self.__data):
                 result = self.__data[self.__current]
                 self.__current += 1
