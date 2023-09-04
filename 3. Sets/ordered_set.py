@@ -1,26 +1,26 @@
-
+from __future__ import annotations
 from typing import Generic, TypeVar
 from collections.abc import Iterator, Iterable
 
 T = TypeVar('T')
-I = TypeVar('I')
+IT = TypeVar('IT')
 
 
 class OrderedSet(Generic[T]):
 
-    class __Iterator(Generic[I]):
+    class __Iterator(Generic[IT]):
 
-        __data: list[I]
+        __data: list[IT]
         __current: int
 
-        def __init__(self, values: list[I]) -> None:
+        def __init__(self, values: list[IT]) -> None:
             self.__data = values
             self.__current = 0
 
-        def __iter__(self) -> Iterator[I]:
+        def __iter__(self) -> Iterator[IT]:
             return self
 
-        def __next__(self) -> I:
+        def __next__(self) -> IT:
             if self.__current < len(self.__data):
                 result = self.__data[self.__current]
                 self.__current += 1
@@ -40,7 +40,7 @@ class OrderedSet(Generic[T]):
             self.__data.append(value)
 
     def __repr__(self) -> str:
-        return f'OrderedSet({self.__data})'
+        return f'OrderedSet({"" if len(self) == 0 else self.__data})'
 
     def __len__(self) -> int:
         return len(self.__data)
@@ -50,6 +50,34 @@ class OrderedSet(Generic[T]):
 
     def __iter__(self) -> Iterator[T]:
         return OrderedSet.__Iterator(self.__data)
+
+    def discard(self, value: T) -> None:
+        for (index, elem) in enumerate(self):
+            if elem == value:
+                del self.__data[index]
+                return
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, OrderedSet) and len(self) == len(other):
+            for elem in self:
+                if elem not in other:
+                    return False
+            return True
+        else:
+            return False
+
+    def __le__(self, other: OrderedSet[T]) -> bool:
+        for elem in self:
+            if elem not in other:
+                return False
+        return True
+
+    def __and__(self, other: OrderedSet[T]) -> OrderedSet[T]:
+        result: OrderedSet[T] = OrderedSet()
+        for elem in self:
+            if elem in other:
+                result.add(elem)
+        return result
 
 
 if __name__ == '__main__':
