@@ -36,6 +36,58 @@ def make_heap(graph: WeightedGraph) -> list[Edge]:
     return queue
 
 
+def add_edge(graph: WeightedGraph, edge: Edge) -> None:
+    weight, u, v = edge
+    graph[u].add((v, weight))
+    graph[v].add((u, weight))
+
+
+def remove_edge(graph: WeightedGraph, edge: Edge) -> None:
+    weight, u, v = edge
+    graph[u].remove((v, weight))
+    graph[v].remove((u, weight))
+
+
+def has_cycle(
+        initial: str,
+        graph: WeightedGraph,
+        visited: Optional[set[str]] = None,
+        parent: Optional[str] = None) -> bool:
+
+    if visited is None:
+        visited = set()
+    visited.add(initial)
+
+    for vertex, _ in graph[initial]:
+        if vertex in visited:
+            if vertex != parent:
+                return True
+        elif has_cycle(vertex, graph, visited, initial):
+            return True
+
+    return False
+
+
+def kruskal_mst(graph: WeightedGraph) -> tuple[int, WeightedGraph]:
+    queue: list[Edge] = make_heap(graph)
+    result: WeightedGraph = {k: set() for k in graph}
+    remaining_edges: int = len(graph) - 1
+    total: int = 0
+    visited: set[str] = set()
+    while remaining_edges:
+        edge: Edge = heappop(queue)
+        add_edge(result, edge)
+        if (edge.u in visited and edge.v in visited
+                and has_cycle(edge.u, result)):
+            remove_edge(result, edge)
+        else:
+            visited.add(edge.u)
+            visited.add(edge.v)
+            total += edge.weight
+            remaining_edges -= 1
+    return (total, result)
+
+
 if __name__ == '__main__':
     from pprint import pprint
     g1: WeightedGraph = {
@@ -47,7 +99,13 @@ if __name__ == '__main__':
         'F': {('D', 1), ('E', 3)}
     }
 
-    e1 = Edge(5, 'A', 'B')
-    e2 = Edge(4, 'B', 'A')
-    print(e1 == e2)
-    print(hash(e1) == hash(e2))
+    pprint(kruskal_mst(g1))
+
+    g2: WeightedGraph = {
+        'A': {('B', 1), ('C', 1)},
+        'B': {('A', 1), ('C', 1), ('D', 3)},
+        'C': {('A', 1), ('B', 1), ('D', 4)},
+        'D': {('B', 3), ('C', 4)}
+    }
+
+    pprint(kruskal_mst(g2))
